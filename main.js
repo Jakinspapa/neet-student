@@ -13,7 +13,7 @@ currentProfile = null,
 isPremiumActive = () => {
   if (!currentProfile) return false;
   if (!currentProfile.is_premium) return false;
-  if (!currentProfile.premium_expires_at) return true; // date awm lo -> lifetime premium
+  if (!currentProfile.premium_expires_at) return true;
   return new Date(currentProfile.premium_expires_at) > new Date();
 },
 isCoachingActive = () => {
@@ -298,7 +298,7 @@ async function loadAll() {
     selectedMockFilter = allTests[0].id;
 }
 function isPremium() {
-  return !!myPremium;
+  return !!myPremium || isPremiumActive();
 }
 function esc(s) {
   const d = document.createElement('div');
