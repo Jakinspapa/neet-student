@@ -9,12 +9,23 @@ let allTests = [],
   currentQs = [],
   userAnswers = {},
   currentUser = null,
-  currentProfile = null,
-  authMode = 'login',
-  dashTab = 'dashboard',
-  myAttempts = [],
-  myPayments = [],
-  leaderboard = [],
+currentProfile = null,
+isPremiumActive = () => {
+  if (!currentProfile) return false;
+  if (!currentProfile.is_premium) return false;
+  if (!currentProfile.premium_expires_at) return true; // date awm lo -> lifetime premium
+  return new Date(currentProfile.premium_expires_at) > new Date();
+},
+isCoachingActive = () => {
+  if (!currentProfile) return false;
+  if (!currentProfile.is_coaching) return false;
+  if (!currentProfile.coaching_expires_at) return true;
+  return new Date(currentProfile.coaching_expires_at) > new Date();
+},
+authMode = 'login',
+dashTab = 'dashboard',
+myAttempts = [],  
+leaderboard = [],
   allUsers = [],
   paySettings = {
     upi1: 'hriatnuiazyu@oksbi',
