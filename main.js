@@ -24,7 +24,7 @@ isCoachingActive = () => {
 },
 authMode = 'login',
 dashTab = 'dashboard',
-myAttempts = [],  
+myAttempts = [],
 leaderboard = [],
   allUsers = [],
   paySettings = {
@@ -49,7 +49,6 @@ leaderboard = [],
   totalInterval = null,
   allVideos = [],
   selectedVideo = null,
-  // MODERN DASHBOARD + NOTIFICATION - NEW ADD CHAUH - ENGMAH PAIH LO
   allNotis = [],
   showNotiPanel = false;
 
@@ -88,8 +87,8 @@ async function uploadGpayScreenshot() {
   if (!gpayFile) return null;
   const fileName = `gpay_${currentUser.id}_${Date.now()}_${gpayFile.name}`;
   const { error } = await supabase.storage
-    .from('payments')
-    .upload(fileName, gpayFile);
+   .from('payments')
+   .upload(fileName, gpayFile);
   if (error) throw error;
   const { data } = supabase.storage.from('payments').getPublicUrl(fileName);
   return data.publicUrl;
@@ -114,7 +113,7 @@ window.viewAttempt = function (attemptId) {
   qs.forEach((q, i) => {
     const userAns = ans[i] || ans[String(i)] || 'Not Answered';
     const correctAns = q.ans;
-    const isWrong = userAns !== correctAns;
+    const isWrong = userAns!== correctAns;
     if (!isWrong) return;
     wrongCount++;
     wrongHtml += `<div style="background:white;border-radius:16px;padding:16px;margin-bottom:12px;border-left:4px solid #ef4444"><div style="display:flex;justify-content:space-between"><b>Q${
@@ -127,22 +126,22 @@ window.viewAttempt = function (attemptId) {
       'C',
       'D',
     ]
-      .map((o) => {
+     .map((o) => {
         const isCorrect = o === correctAns;
-        const isUserWrong = o === userAns && o !== correctAns;
+        const isUserWrong = o === userAns && o!== correctAns;
         return `<div style="padding:8px 10px;border-radius:10px;border:2px solid ${
-          isCorrect ? '#10b981' : isUserWrong ? '#ef4444' : '#eee'
+          isCorrect? '#10b981' : isUserWrong? '#ef4444' : '#eee'
         };background:${
-          isCorrect ? '#ecfdf5' : isUserWrong ? '#fef2f2' : 'white'
+          isCorrect? '#ecfdf5' : isUserWrong? '#fef2f2' : 'white'
         };display:flex;justify-content:space-between"><span>${o}. ${esc(
           q[o.toLowerCase()] || ''
         )}</span><span style="font-size:11px;font-weight:800">${
-          isCorrect ? '✅ Correct' : isUserWrong ? '❌ Your Answer' : ''
+          isCorrect? '✅ Correct' : isUserWrong? '❌ Your Answer' : ''
         }</span></div>`;
       })
-      .join('')}</div>${
+     .join('')}</div>${
       q.explanation || q.exp
-        ? `<div style="margin-top:10px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:2px solid #f59e0b;border-radius:12px;padding:12px;"><div style="display:flex;align-items:center;gap:6px;font-weight:900;color:#92400e;font-size:13px;margin-bottom:6px;"><span style="background:#f59e0b;color:white;width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;">💡</span> Explanation - Hrilhfiahna</div><div style="font-size:13px;color:#78350f;line-height:1.6;white-space:pre-wrap;background:white;padding:10px;border-radius:8px;border:1px solid #fde68a;">${esc(
+       ? `<div style="margin-top:10px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:2px solid #f59e0b;border-radius:12px;padding:12px;"><div style="display:flex;align-items:center;gap:6px;font-weight:900;color:#92400e;font-size:13px;margin-bottom:6px;"><span style="background:#f59e0b;color:white;width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;">💡</span> Explanation - Hrilhfiahna</div><div style="font-size:13px;color:#78350f;line-height:1.6;white-space:pre-wrap;background:white;padding:10px;border-radius:8px;border:1px solid #fde68a;">${esc(
             q.explanation || q.exp
           )}</div></div>`
         : `<div style="margin-top:8px;background:#fee2e2;border:1px dashed #fca5a5;padding:8px;border-radius:10px;font-size:11px;color:#991b1b;text-align:center;">⚠️ Admin ah Explanation la dah lo - Q${
@@ -195,53 +194,53 @@ async function updateOnline() {
   if (!currentUser) return;
   try {
     await supabase
-      .from('profiles')
-      .update({ last_seen: new Date().toISOString(), is_online: true })
-      .eq('id', currentUser.id);
+     .from('profiles')
+     .update({ last_seen: new Date().toISOString(), is_online: true })
+     .eq('id', currentUser.id);
   } catch (e) {}
 }
 async function loadAll() {
   const r = await Promise.all([
     supabase.from('profiles').select('*').eq('id', currentUser.id).single(),
     supabase
-      .from('mock_tests')
-      .select('*')
-      .order('created_at', { ascending: false }),
+     .from('mock_tests')
+     .select('*')
+     .order('created_at', { ascending: false }),
     supabase
-      .from('test_attempts')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .order('created_at', { ascending: false }),
+     .from('test_attempts')
+     .select('*')
+     .eq('user_id', currentUser.id)
+     .order('created_at', { ascending: false }),
     supabase
-      .from('payment_requests')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .order('created_at', { ascending: false }),
+     .from('payment_requests')
+     .select('*')
+     .eq('user_id', currentUser.id)
+     .order('created_at', { ascending: false }),
     supabase
-      .from('premium_payments')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .order('created_at', { ascending: false }),
+     .from('premium_payments')
+     .select('*')
+     .eq('user_id', currentUser.id)
+     .order('created_at', { ascending: false }),
     supabase
-      .from('premium_plans')
-      .select('*')
-      .order('price', { ascending: true }),
+     .from('premium_plans')
+     .select('*')
+     .order('price', { ascending: true }),
     supabase.from('payment_settings').select('*').eq('id', 1).maybeSingle(),
     supabase.from('profiles').select('*').limit(100),
     supabase
-      .from('test_attempts')
-      .select('*')
-      .order('score', { ascending: false })
-      .limit(200),
+     .from('test_attempts')
+     .select('*')
+     .order('score', { ascending: false })
+     .limit(200),
     supabase
-      .from('coaching_videos')
-      .select('*')
-      .order('created_at', { ascending: false }),
+     .from('coaching_videos')
+     .select('*')
+     .order('created_at', { ascending: false }),
     supabase
-      .from('notifications')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(20),
+     .from('notifications')
+     .select('*')
+     .order('created_at', { ascending: false })
+     .limit(20),
   ]);
   currentProfile = r[0].data || { full_name: currentUser.email };
   allTests = r[1].data || [];
@@ -253,26 +252,8 @@ async function loadAll() {
   leaderboard = r[8].data || [];
   allVideos = r[9].data || [];
   allNotis = r[10].data || [];
-  allNotis = r[10].data || [];
-  console.log('NOTI DATA:', r[10].data, 'ERROR:', r[10].error); // DEBUG LINE - ADD HI
-
-  // REALTIME ADD - HEI HI ADD RAWH
-  try {
-    supabase
-      .channel('noti-channel')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'notifications' },
-        () => {
-          console.log('New Noti - reloading');
-          loadAll();
-        }
-      )
-      .subscribe();
-  } catch (e) {}
-
-  if (r[6].data) paySettings = { ...paySettings, ...r[6].data };
-  if (r[6].data) paySettings = { ...paySettings, ...r[6].data };
+  if (r[6].data) paySettings = {...paySettings,...r[6].data };
+  if (r[6].data) paySettings = {...paySettings,...r[6].data };
   const approved = (r[4].data || []).filter((p) => p.status === 'approved');
   let active = null;
   for (let i = 0; i < approved.length; i++) {
@@ -298,7 +279,7 @@ async function loadAll() {
     selectedMockFilter = allTests[0].id;
 }
 function isPremium() {
-  return !!myPremium || isPremiumActive();
+  return!!myPremium || isPremiumActive();
 }
 function esc(s) {
   const d = document.createElement('div');
@@ -336,7 +317,7 @@ function getStatus(t) {
 }
 function getUserName(uid) {
   const u = allUsers.find((x) => x.id === uid);
-  return u ? u.full_name || u.email : uid.slice(0, 6);
+  return u? u.full_name || u.email : uid.slice(0, 6);
 }
 function getMockInfo(mid) {
   const m = allTests.find((x) => String(x.id) === String(mid));
@@ -348,11 +329,11 @@ function renderLogin() {
   document.querySelector(
     '#app'
   ).innerHTML = `<div style="min-height:100vh;background:linear-gradient(135deg,#0f172a,#334155);display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui"><div style="background:white;border-radius:24px;padding:32px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.3)"><h1 style="text-align:center;margin:0">NEET Mock ${
-    isPremium() ? '👑' : ''
+    isPremium()? '👑' : ''
   }</h1><p style="text-align:center;color:#666;font-size:12px">Mizoram • Forgot Password Ready</p><div style="display:flex;gap:8px;margin:16px 0;background:#f3f4f6;padding:4px;border-radius:12px"><button onclick="window.setMode('login')" style="flex:1;padding:10px;border:none;border-radius:8px;background:${
-    authMode === 'login' ? 'white' : 'transparent'
+    authMode === 'login'? 'white' : 'transparent'
   };font-weight:700;cursor:pointer">Login</button><button onclick="window.setMode('signup')" style="flex:1;padding:10px;border:none;border-radius:8px;background:${
-    authMode === 'signup' ? 'white' : 'transparent'
+    authMode === 'signup'? 'white' : 'transparent'
   };font-weight:700;cursor:pointer">Signup</button></div><div id="formBox"></div><div style="text-align:center;margin-top:12px"><a href="#" onclick="window.showForgot()" style="color:#667eea;font-size:12px;font-weight:600;text-decoration:none">🔑 Forgot Password?</a></div></div></div>`;
   renderForm();
 }
@@ -411,7 +392,7 @@ window.doReset = async function () {
     if (msg) msg.innerHTML = '<span style="color:red">6+ chars</span>';
     return;
   }
-  if (p1 !== p2) {
+  if (p1!== p2) {
     if (msg) msg.innerHTML = '<span style="color:red">Inmil lo</span>';
     return;
   }
@@ -447,7 +428,7 @@ window.doSignup = async function () {
   const p = document.getElementById('password').value;
   const n = document.getElementById('fname').value;
   const ph = document.getElementById('phone').value;
-  if (!e || !p || !n) return alert('Fill kim rawh');
+  if (!e ||!p ||!n) return alert('Fill kim rawh');
   const d = await supabase.auth.signUp({
     email: e,
     password: p,
@@ -469,7 +450,7 @@ window.doSignup = async function () {
   }
 };
 window.setDashTab = function (t) {
-  if (t !== 'videos') selectedVideo = null;
+  if (t!== 'videos') selectedVideo = null;
   dashTab = t;
   renderDashboard();
 };
@@ -477,9 +458,9 @@ window.logout = async function () {
   try {
     if (currentUser)
       await supabase
-        .from('profiles')
-        .update({ is_online: false })
-        .eq('id', currentUser.id);
+       .from('profiles')
+       .update({ is_online: false })
+       .eq('id', currentUser.id);
   } catch (e) {}
   if (onlineInterval) clearInterval(onlineInterval);
   clearTimers();
@@ -504,7 +485,7 @@ window.closeVideo = function () {
   renderDashboard();
 };
 window.toggleNoti = function () {
-  showNotiPanel = !showNotiPanel;
+  showNotiPanel =!showNotiPanel;
   renderDashboard();
 };
 
@@ -512,16 +493,31 @@ function renderDashboard() {
   const free = allTests.filter((t) => t.access_type === 'free');
   const paid = allTests.filter((t) => t.access_type === 'paid');
   const avg = myAttempts.length
-    ? Math.round(
+   ? Math.round(
         myAttempts.reduce((s, a) => s + (a.score || 0), 0) / myAttempts.length
       )
     : 0;
   const bestScore = myAttempts.length
-    ? Math.max(...myAttempts.map((a) => a.score || 0))
+   ? Math.max(...myAttempts.map((a) => a.score || 0))
     : 0;
   const totalQAttempted = myAttempts.reduce((s, a) => s + (a.total || 0), 0);
   const totalCorrect = myAttempts.reduce((s, a) => s + (a.correct || 0), 0);
   const premActive = isPremium();
+
+  // === NEW: EXPIRY DISPLAY LOGIC - ADDED ONLY ===
+  const premExpiryText = (() => {
+    if (!premActive) return 'INACTIVE - Premium lei rawh';
+    if (!currentProfile?.premium_expires_at) return '♾️ LIFETIME - A ral ngai lo';
+    try {
+      const d = new Date(currentProfile.premium_expires_at);
+      const diff = d - new Date();
+      if (diff <= 0) return `❌ EXPIRED - ${d.toLocaleDateString()}`;
+      const daysLeft = Math.ceil(diff / 86400000);
+      return `${d.toLocaleDateString()} - ${daysLeft} days left`;
+    } catch(e) { return currentProfile.premium_expires_at; }
+  })();
+  // === END NEW ===
+
   let pendingBanner = '';
   if (myPremiumPending) {
     pendingBanner += `<div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:12px;padding:12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center"><div><b style="color:#92400e">⏳ Premium Pending</b><br><small style="font-size:11px">Rs.${
@@ -535,14 +531,14 @@ function renderDashboard() {
   ).length;
   if (pendingPaidCount > 0) {
     pendingBanner += `<div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:12px;padding:12px;margin-bottom:12px"><b style="color:#92400e;font-size:12px">⏳ Paid Tests Pending: ${pendingPaidCount}</b><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">${myPayments
-      .filter((p) => p.status === 'pending')
-      .map((p) => {
+     .filter((p) => p.status === 'pending')
+     .map((p) => {
         const inf = getMockInfo(p.test_id);
         return `<span style="background:white;border:1px solid #f59e0b;padding:4px 8px;border-radius:20px;font-size:10px">⏳ ${esc(
           inf.title
         )} - Rs.${p.amount}</span>`;
       })
-      .join('')}</div></div>`;
+     .join('')}</div></div>`;
   }
 
   const dashStats = `
@@ -554,19 +550,17 @@ function renderDashboard() {
   } Available</div></div>
       <div style="background:linear-gradient(135deg,#10b981,#059669);color:white;border-radius:20px;padding:16px;position:relative;overflow:hidden"><div style="position:absolute;right:-10px;top:-10px;font-size:60px;opacity:0.2">⭐</div><div style="font-size:11px;opacity:0.8">AVG SCORE</div><div style="font-size:28px;font-weight:900;margin-top:4px">${avg}%</div><div style="font-size:10px;margin-top:6px;background:rgba(255,255,255,0.2);display:inline-block;padding:2px 8px;border-radius:20px">Best ${bestScore}%</div></div>
       <div style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border-radius:20px;padding:16px;position:relative;overflow:hidden"><div style="position:absolute;right:-10px;top:-10px;font-size:60px;opacity:0.2">✅</div><div style="font-size:11px;opacity:0.8">CORRECT</div><div style="font-size:28px;font-weight:900;margin-top:4px">${totalCorrect}/${totalQAttempted}</div><div style="font-size:10px;margin-top:6px;background:rgba(255,255,255,0.2);display:inline-block;padding:2px 8px;border-radius:20px">${
-    totalQAttempted ? Math.round((totalCorrect / totalQAttempted) * 100) : 0
+    totalQAttempted? Math.round((totalCorrect / totalQAttempted) * 100) : 0
   }% Accuracy</div></div>
       <div style="background:linear-gradient(135deg,#0f172a,#334155);color:white;border-radius:20px;padding:16px;position:relative;overflow:hidden"><div style="position:absolute;right:-10px;top:-10px;font-size:60px;opacity:0.2">🏆</div><div style="font-size:11px;opacity:0.8">PREMIUM</div><div style="font-size:16px;font-weight:900;margin-top:8px">${
-        premActive ? '👑 ACTIVE' : '🔒 INACTIVE'
-      }</div><div style="font-size:10px;margin-top:6px;background:rgba(255,255,255,0.2);display:inline-block;padding:2px 8px;border-radius:20px">${
-    allVideos.length
-  } Videos • ${allNotis.length} Noti</div></div>
+        premActive? '👑 ACTIVE' : '🔒 INACTIVE'
+      }</div><div style="font-size:10px;margin-top:6px;background:rgba(255,255,255,0.2);display:inline-block;padding:2px 8px;border-radius:20px;word-break:break-all">${premExpiryText}</div></div>
     </div>`;
 
   const notiPanelHtml = `
     <div id="notiPanel" style="background:white;border-radius:20px;padding:0;margin-bottom:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.05);display:${
       dashTab === 'dashboard' || dashTab === 'tests' || showNotiPanel
-        ? 'block'
+       ? 'block'
         : 'none'
     }">
       <div style="background:linear-gradient(135deg,#0f172a,#334155);color:white;padding:14px 18px;display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">🔔</span><b>Notifications</b><span style="background:#f59e0b;color:white;padding:2px 8px;border-radius:20px;font-size:10px;margin-left:6px">${
@@ -575,8 +569,8 @@ function renderDashboard() {
       <div style="max-height:280px;overflow-y:auto;padding:8px">
         ${
           allNotis.length
-            ? allNotis
-                .map(
+           ? allNotis
+               .map(
                   (n) =>
                     `<div style="padding:12px;border-radius:14px;margin-bottom:8px;background:#f8fafc;border-left:4px solid #667eea;display:flex;gap:10px"><div style="width:36px;height:36px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;flex-shrink:0">📢</div><div style="flex:1"><b style="font-size:13px">${esc(
                       n.title
@@ -586,7 +580,7 @@ function renderDashboard() {
                       n.created_at
                     ).toLocaleString()}</small></div></div>`
                 )
-                .join('')
+               .join('')
             : `<div style="text-align:center;padding:24px;color:#94a3b8"><div style="font-size:32px">🔕</div><div style="font-size:13px;margin-top:6px">Notification la awm lo - Admin in a rawn thawn ang!</div></div>`
         }
       </div>
@@ -599,37 +593,37 @@ function renderDashboard() {
       (t.per_question_seconds || 0) > 0 || (t.total_seconds || 0) > 0;
     const locked = isTestLocked(t);
     freeHtml += `<div style="background:white;border-radius:16px;padding:16px;border:1px solid ${
-      locked ? '#8b5cf6' : '#eee'
-    };border-left:4px solid ${locked ? '#8b5cf6' : s.color};${
-      locked ? 'background:#f5f3ff' : ''
+      locked? '#8b5cf6' : '#eee'
+    };border-left:4px solid ${locked? '#8b5cf6' : s.color};${
+      locked? 'background:#f5f3ff' : ''
     }"><b>${esc(
       t.title
     )}</b> <small style="background:#eef2ff;color:#667eea;padding:2px 6px;border-radius:8px">${esc(
       t.subject || ''
     )}</small>${
       hasTimer
-        ? `<br><small style="color:#f59e0b">⏱️ Q:${
+       ? `<br><small style="color:#f59e0b">⏱️ Q:${
             t.per_question_seconds || 0
           }s Full:${
-            t.total_seconds ? formatSec(t.total_seconds) : 'Off'
+            t.total_seconds? formatSec(t.total_seconds) : 'Off'
           }</small>`
         : ''
     }${
       t.is_scheduled
-        ? `<br><small style="background:#ede9fe;color:#6d28d9;padding:3px 8px;border-radius:20px;font-weight:800">${
-            locked ? '📅 ' + getLockTime(t) + ' LOCKED' : '🟢 LIVE'
+       ? `<br><small style="background:#ede9fe;color:#6d28d9;padding:3px 8px;border-radius:20px;font-weight:800">${
+            locked? '📅 ' + getLockTime(t) + ' LOCKED' : '🟢 LIVE'
           }</small>`
         : ''
     }<div style="font-size:11px;color:#666">${
-      t.questions ? t.questions.length : 0
+      t.questions? t.questions.length : 0
     } Qs</div><button onclick="${
       locked
-        ? `alert('📅 ${getLockTime(t)} ah hawng ang!')`
+       ? `alert('📅 ${getLockTime(t)} ah hawng ang!')`
         : `window.startTest('${t.id}')`
     }" style="width:100%;margin-top:8px;padding:10px;border:none;border-radius:10px;background:${
-      locked ? '#8b5cf6' : '#111'
+      locked? '#8b5cf6' : '#111'
     };color:white;font-weight:700">${
-      locked ? '🔒 ' + getLockTime(t) : 'Start'
+      locked? '🔒 ' + getLockTime(t) : 'Start'
     }</button></div>`;
   });
   let paidHtml = '';
@@ -640,77 +634,77 @@ function renderDashboard() {
       (t.per_question_seconds || 0) > 0 || (t.total_seconds || 0) > 0;
     const locked = isTestLocked(t);
     paidHtml += `<div style="background:white;border-radius:16px;padding:16px;border:1px solid ${
-      isPend ? '#f59e0b' : locked ? '#8b5cf6' : '#eee'
+      isPend? '#f59e0b' : locked? '#8b5cf6' : '#eee'
     };border-left:4px solid ${
-      s.prem ? '#10b981' : isPend ? '#f59e0b' : locked ? '#8b5cf6' : 'gold'
+      s.prem? '#10b981' : isPend? '#f59e0b' : locked? '#8b5cf6' : 'gold'
     };${
-      isPend ? 'background:#fffbeb' : locked ? 'background:#f5f3ff' : ''
+      isPend? 'background:#fffbeb' : locked? 'background:#f5f3ff' : ''
     }"><div style="display:flex;justify-content:space-between"><b>${esc(
       t.title
     )}</b>${
       isPend
-        ? '<span style="background:#f59e0b;color:white;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:900">⏳ PENDING</span>'
+       ? '<span style="background:#f59e0b;color:white;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:900">⏳ PENDING</span>'
         : locked
-        ? '<span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:20px;font-size:9px">📅 LOCKED</span>'
+       ? '<span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:20px;font-size:9px">📅 LOCKED</span>'
         : ''
     }</div><small style="background:#fffbeb;padding:2px 6px;border-radius:8px">${esc(
       t.subject || ''
     )}</small>${
       hasTimer
-        ? `<small style="margin-left:6px;color:#3b82f6">⏱️ ${
-            t.per_question_seconds ? t.per_question_seconds + 's/Q' : ''
+       ? `<small style="margin-left:6px;color:#3b82f6">⏱️ ${
+            t.per_question_seconds? t.per_question_seconds + 's/Q' : ''
           } ${
-            t.total_seconds ? formatSec(t.total_seconds) + ' total' : ''
+            t.total_seconds? formatSec(t.total_seconds) + ' total' : ''
           }</small>`
         : ''
     }${
       t.is_scheduled
-        ? `<br><small style="background:#ede9fe;color:#6d28d9;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:800">${
-            locked ? '🔒 ' + getLockTime(t) : '✅ LIVE NOW'
+       ? `<br><small style="background:#ede9fe;color:#6d28d9;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:800">${
+            locked? '🔒 ' + getLockTime(t) : '✅ LIVE NOW'
           }</small>`
         : ''
-    }<div style="font-size:11px;color:${isPend ? '#92400e' : '#666'}">${
-      t.questions ? t.questions.length : 0
+    }<div style="font-size:11px;color:${isPend? '#92400e' : '#666'}">${
+      t.questions? t.questions.length : 0
     } Qs - ${esc(s.label)}</div>${
       isPend
-        ? `<div style="font-size:10px;color:#92400e;margin-top:4px">Admin in screenshot a check mek</div>`
+       ? `<div style="font-size:10px;color:#92400e;margin-top:4px">Admin in screenshot a check mek</div>`
         : locked
-        ? `<div style="font-size:10px;color:#6d28d9;margin-top:4px">📅 ${getLockTime(
+       ? `<div style="font-size:10px;color:#6d28d9;margin-top:4px">📅 ${getLockTime(
             t
           )} ah hawng ang!</div>`
         : ''
     }<button onclick="${
       locked
-        ? `alert('📅 ${getLockTime(t)} ah hawng ang!')`
+       ? `alert('📅 ${getLockTime(t)} ah hawng ang!')`
         : s.ok
-        ? `window.startTest('${t.id}')`
+       ? `window.startTest('${t.id}')`
         : isPend
-        ? `alert('Admin approval nghah mek')`
+       ? `alert('Admin approval nghah mek')`
         : `window.buyTest('${t.id}')`
     }" style="width:100%;margin-top:8px;padding:10px;border:none;border-radius:10px;background:${
       locked
-        ? '#8b5cf6'
+       ? '#8b5cf6'
         : s.prem
-        ? '#10b981'
+       ? '#10b981'
         : s.ok
-        ? '#10b981'
+       ? '#10b981'
         : isPend
-        ? '#f59e0b'
+       ? '#f59e0b'
         : 'gold'
-    };color:${isPend || locked ? 'white' : '#111'};font-weight:800">${
-      locked ? '🔒 ' + getLockTime(t) : s.btn
+    };color:${isPend || locked? 'white' : '#111'};font-weight:800">${
+      locked? '🔒 ' + getLockTime(t) : s.btn
     }</button></div>`;
   });
   let mockOptions = '';
   allTests.forEach((t) => {
     mockOptions += `<option value="${t.id}" ${
-      String(selectedMockFilter) === String(t.id) ? 'selected' : ''
+      String(selectedMockFilter) === String(t.id)? 'selected' : ''
     }>${esc(t.title)} - ${esc(t.subject || 'General')}</option>`;
   });
   const filtered = leaderboard
-    .filter((a) => String(a.test_id) === String(selectedMockFilter))
-    .sort((a, b) => (b.score || 0) - (a.score || 0))
-    .slice(0, 20);
+   .filter((a) => String(a.test_id) === String(selectedMockFilter))
+   .sort((a, b) => (b.score || 0) - (a.score || 0))
+   .slice(0, 20);
   const selInfo = getMockInfo(selectedMockFilter);
   let tableRows = '';
   if (filtered.length === 0) {
@@ -752,12 +746,12 @@ function renderDashboard() {
         allVideos.length
       } Videos Available:</b><br>${
         allVideos
-          .slice(0, 3)
-          .map((v) => `• ${esc(v.title)} - ${esc(v.subject)}`)
-          .join('<br>') || '• Video la awm lo'
+         .slice(0, 3)
+         .map((v) => `• ${esc(v.title)} - ${esc(v.subject)}`)
+         .join('<br>') || '• Video la awm lo'
       }${
         allVideos.length > 3
-          ? `<br><small>+ ${allVideos.length - 3} more...</small>`
+         ? `<br><small>+ ${allVideos.length - 3} more...</small>`
           : ''
       }</div><button onclick="window.setDashTab('premium')" style="padding:12px 24px;background:#f59e0b;color:white;border:none;border-radius:12px;font-weight:900;width:100%">👑 Buy Premium to Watch - Rs.${
         premiumPlans[0]?.price || 199
@@ -765,7 +759,7 @@ function renderDashboard() {
     } else {
       videoHtml = `<div style="display:grid;gap:10px">${
         allVideos
-          .map(
+         .map(
             (v) =>
               `<div onclick="window.playVideo('${
                 v.id
@@ -775,7 +769,7 @@ function renderDashboard() {
                 (v.description || '').slice(0, 40)
               )}...</small><br><span style="font-size:10px;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:10px">🔒 PREMIUM • MP4 • 1GB</span></div><div style="display:flex;align-items:center;font-size:18px">▶️</div></div>`
           )
-          .join('') ||
+         .join('') ||
         '<div style="text-align:center;padding:30px;color:#999">Video la awm lo - Admin in a rawn upload ang</div>'
       }</div>`;
     }
@@ -783,52 +777,52 @@ function renderDashboard() {
 
   document.querySelector('#app').innerHTML =
     `<div style="min-height:100vh;background:#f6f7fb;font-family:system-ui"><div style="background:${
-      premActive ? 'linear-gradient(135deg,#10b981,#059669)' : 'white'
+      premActive? 'linear-gradient(135deg,#10b981,#059669)' : 'white'
     };padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;border-bottom:1px solid #eee;flex-wrap:wrap;gap:8px"><div><b>NEET Mock ${
-      premActive ? 'PREMIUM' : myPremiumPending ? '⏳ PENDING' : ''
+      premActive? 'PREMIUM' : myPremiumPending? '⏳ PENDING' : ''
     }</b><br><small>Avg ${avg}% • 🟢 Online ${
-      myPremiumPending ? '• 1 Pending' : ''
-    } ${pendingPaidCount ? `• ${pendingPaidCount} Tests Pending` : ''} • 🔔 ${
+      myPremiumPending? '• 1 Pending' : ''
+    } ${pendingPaidCount? `• ${pendingPaidCount} Tests Pending` : ''} • 🔔 ${
       allNotis.length
-    }</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button onclick="window.toggleNoti()" style="position:relative;padding:8px 12px;border-radius:20px;border:1px solid #f59e0b;background:#fffbeb;color:#92400e;font-weight:800;font-size:12px">🔔 ${
+    } • ${premExpiryText}</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button onclick="window.toggleNoti()" style="position:relative;padding:8px 12px;border-radius:20px;border:1px solid #f59e0b;background:#fffbeb;color:#92400e;font-weight:800;font-size:12px">🔔 ${
       allNotis.length
-        ? `<span style="position:absolute;top:-6px;right:-6px;background:#ef4444;color:white;width:18px;height:18px;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center">${allNotis.length}</span>`
+       ? `<span style="position:absolute;top:-6px;right:-6px;background:#ef4444;color:white;width:18px;height:18px;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center">${allNotis.length}</span>`
         : ''
     } Noti</button><button onclick="window.setDashTab('dashboard')" style="padding:8px 12px;border-radius:20px;border:none;background:${
-      dashTab === 'dashboard' ? '#0f172a' : '#f3f4f6'
+      dashTab === 'dashboard'? '#0f172a' : '#f3f4f6'
     };color:${
-      dashTab === 'dashboard' ? 'white' : '#111'
+      dashTab === 'dashboard'? 'white' : '#111'
     };font-weight:700;font-size:12px">📊 Dash</button><button onclick="window.setDashTab('tests')" style="padding:8px 12px;border-radius:20px;border:none;background:${
-      dashTab === 'tests' ? '#111' : '#f3f4f6'
+      dashTab === 'tests'? '#111' : '#f3f4f6'
     };color:${
-      dashTab === 'tests' ? 'white' : '#111'
+      dashTab === 'tests'? 'white' : '#111'
     };font-weight:700;font-size:12px">Tests ${
-      pendingPaidCount ? `(${pendingPaidCount} ⏳)` : ''
+      pendingPaidCount? `(${pendingPaidCount} ⏳)` : ''
     }</button><button onclick="window.setDashTab('videos')" style="padding:8px 12px;border-radius:20px;border:none;background:${
-      dashTab === 'videos' ? '#f59e0b' : '#fffbeb'
+      dashTab === 'videos'? '#f59e0b' : '#fffbeb'
     };color:${
-      dashTab === 'videos' ? 'white' : '#92400e'
+      dashTab === 'videos'? 'white' : '#92400e'
     };font-weight:800;font-size:12px;border:1px solid #f59e0b">🎥 Videos ${
-      !premActive ? '🔒' : ''
+     !premActive? '🔒' : ''
     } (${
       allVideos.length
     })</button><button onclick="window.setDashTab('premium')" style="padding:8px 12px;border-radius:20px;border:none;background:${
-      myPremiumPending ? '#f59e0b' : '#f59e0b'
+      myPremiumPending? '#f59e0b' : '#f59e0b'
     };color:white;font-weight:700;font-size:12px">Premium ${
-      myPremiumPending ? '⏳' : ''
+      myPremiumPending? '⏳' : ''
     }</button><button onclick="window.setDashTab('results')" style="padding:8px 12px;border-radius:20px;border:none;background:${
-      dashTab === 'results' ? '#111' : '#f3f4f6'
+      dashTab === 'results'? '#111' : '#f3f4f6'
     };color:${
-      dashTab === 'results' ? 'white' : '#111'
+      dashTab === 'results'? 'white' : '#111'
     };font-size:12px">Results</button><button onclick="window.setDashTab('leaderboard')" style="padding:8px 12px;border-radius:20px;border:none;background:${
-      dashTab === 'leaderboard' ? '#111' : '#f3f4f6'
+      dashTab === 'leaderboard'? '#111' : '#f3f4f6'
     };color:${
-      dashTab === 'leaderboard' ? 'white' : '#111'
+      dashTab === 'leaderboard'? 'white' : '#111'
     };font-size:12px">Board</button><button onclick="window.logout()" style="padding:8px 12px;border-radius:20px;border:1px solid #ddd;background:white;font-size:12px">Logout</button></div></div><div style="max-width:1000px;margin:0 auto;padding:16px">${pendingBanner}` +
     (dashTab === 'dashboard'
-      ? `<div>${notiPanelHtml}${dashStats}<h3 style="margin:16px 0 12px;display:flex;justify-content:space-between">📚 Recent Tests <button onclick="window.setDashTab('tests')" style="font-size:11px;padding:6px 12px;border-radius:20px;border:1px solid #e2e8f0;background:white">View All →</button></h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">${free
-          .slice(0, 2)
-          .map(
+     ? `<div>${notiPanelHtml}${dashStats}<h3 style="margin:16px 0 12px;display:flex;justify-content:space-between">📚 Recent Tests <button onclick="window.setDashTab('tests')" style="font-size:11px;padding:6px 12px;border-radius:20px;border:1px solid #e2e8f0;background:white">View All →</button></h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">${free
+         .slice(0, 2)
+         .map(
             (t) =>
               `<div style="background:white;border-radius:16px;padding:14px;border:1px solid #e2e8f0"><b>${esc(
                 t.title
@@ -838,9 +832,9 @@ function renderDashboard() {
                 t.id
               }')" style="margin-top:8px;padding:8px 12px;border:none;border-radius:10px;background:#111;color:white;font-weight:700;width:100%">Start</button></div>`
           )
-          .join('')}${paid
-          .slice(0, 2)
-          .map(
+         .join('')}${paid
+         .slice(0, 2)
+         .map(
             (t) =>
               `<div style="background:white;border-radius:16px;padding:14px;border:1px solid #e2e8f0"><b>${esc(
                 t.title
@@ -852,12 +846,12 @@ function renderDashboard() {
                 getStatus(t).btn
               }</button></div>`
           )
-          .join(
+         .join(
             ''
           )}</div><div style="margin-top:20px;background:white;border-radius:20px;padding:16px;border:1px solid #e2e8f0"><h3 style="margin:0 0 12px">📈 Recent Results</h3>${
           myAttempts
-            .slice(0, 5)
-            .map(
+           .slice(0, 5)
+           .map(
               (a) =>
                 `<div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #f1f5f9"><div><b>${esc(
                   getMockInfo(a.test_id).title
@@ -867,45 +861,45 @@ function renderDashboard() {
                   a.score
                 }%</span></div>`
             )
-            .join('') || '<div style="color:#999">No results yet</div>'
+           .join('') || '<div style="color:#999">No results yet</div>'
         }</div></div>`
       : '') +
     (dashTab === 'tests'
-      ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">${notiPanelHtml}<div style="grid-column:1/-1"><h2 style="margin:0 0 12px">📚 All Tests - ${
+     ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">${notiPanelHtml}<div style="grid-column:1/-1"><h2 style="margin:0 0 12px">📚 All Tests - ${
           allTests.length
         }</h2></div>${freeHtml + paidHtml}</div>`
       : '') +
     (dashTab === 'videos'
-      ? `<h2 style="display:flex;justify-content:space-between;align-items:center">🎥 Video Coaching <span style="font-size:12px;background:${
-          premActive ? '#10b981' : '#f59e0b'
+     ? `<h2 style="display:flex;justify-content:space-between;align-items:center">🎥 Video Coaching <span style="font-size:12px;background:${
+          premActive? '#10b981' : '#f59e0b'
         };color:white;padding:4px 10px;border-radius:20px">${
-          premActive ? 'PREMIUM ACTIVE ✓' : '🔒 PREMIUM ONLY'
+          premActive? 'PREMIUM ACTIVE ✓' : '🔒 PREMIUM ONLY'
         }</span></h2>${videoHtml}`
       : '') +
     (dashTab === 'premium'
-      ? `<h2>Premium ${
+     ? `<h2>Premium ${
           myPremiumPending
-            ? '<span style="background:#f59e0b;color:white;padding:4px 10px;border-radius:20px;font-size:11px">⏳ 1 Pending - Admin Approval nghah mek</span>'
+           ? '<span style="background:#f59e0b;color:white;padding:4px 10px;border-radius:20px;font-size:11px">⏳ 1 Pending - Admin Approval nghah mek</span>'
             : ''
-        }</h2>${
+        }</h2><div style="background:linear-gradient(135deg,#0f172a,#334155);color:white;border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid #10b981"><b>👑 My Premium Status</b><div style="margin-top:8px;font-size:13px;line-height:1.6"><div>Status: ${premActive? '✅ <b style="color:#10b981">ACTIVE</b>' : '❌ INACTIVE'}</div><div>Expiry: <b>${premExpiryText}</b></div>${currentProfile?.premium_started_at? `<div>Started: ${new Date(currentProfile.premium_started_at).toLocaleDateString()}</div>` : ''}${currentProfile?.premium_plan? `<div>Plan ID: ${esc(currentProfile.premium_plan)}</div>` : ''}<div style="margin-top:6px;font-size:11px;opacity:0.7">Expire hunah auto in FREE ah a tla ang!</div></div></div>${
           myPremiumPending
-            ? `<div style="background:#fffbeb;border:2px solid #f59e0b;border-radius:16px;padding:16px;margin-bottom:12px"><b style="color:#92400e">⏳ Premium Payment Pending</b><div style="font-size:12px;margin-top:6px">Plan: ${
+           ? `<div style="background:#fffbeb;border:2px solid #f59e0b;border-radius:16px;padding:16px;margin-bottom:12px"><b style="color:#92400e">⏳ Premium Payment Pending</b><div style="font-size:12px;margin-top:6px">Plan: ${
                 premiumPlans.find((p) => p.id === myPremiumPending.plan_id)
-                  ?.name || ''
+                 ?.name || ''
               } - Rs.${myPremiumPending.amount}<br>Txn: ${esc(
                 myPremiumPending.txn_id
               )}<br>Status: <span style="background:#f59e0b;color:white;padding:2px 8px;border-radius:20px;font-size:10px">PENDING APPROVAL</span><br><small>Screenshot admin in a check mek - approve hunah premium active ang</small></div></div>`
             : ''
         }<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">${premiumPlans
-          .map(
+         .map(
             (pl) =>
               `<div style="background:white;border-radius:16px;padding:16px;border:1px solid #eee"><b>${pl.name}</b><div style="font-size:24px;font-weight:900">Rs.${pl.price}</div><button onclick="window.buyPremium(${pl.id})" style="width:100%;padding:10px;background:#f59e0b;color:white;border:none;border-radius:10px;font-weight:800;margin-top:8px">Buy</button></div>`
           )
-          .join(
+         .join(
             ''
           )}</div><h3 style="margin-top:20px">My Premium Payments History</h3><div style="background:white;border-radius:16px;padding:12px">${
           myAllPremiumPayments
-            .map((p) => {
+           .map((p) => {
               const pl = premiumPlans.find((x) => x.id === p.plan_id);
               return `<div style="padding:10px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center"><div><b>${
                 pl?.name || 'Premium'
@@ -915,26 +909,26 @@ function renderDashboard() {
                 p.created_at
               ).toLocaleDateString()}</small></div><span style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;background:${
                 p.status === 'approved'
-                  ? '#10b981'
+                 ? '#10b981'
                   : p.status === 'pending'
-                  ? '#f59e0b'
+                 ? '#f59e0b'
                   : '#ef4444'
               };color:white">${p.status.toUpperCase()}</span></div>`;
             })
-            .join('') || '<div style="color:#999">No premium payments yet</div>'
+           .join('') || '<div style="color:#999">No premium payments yet</div>'
         }</div>`
       : '') +
     (dashTab === 'results'
-      ? `<h2>Results - Paid ah Wrong Questions i hmu thei</h2><div style="background:white;border-radius:16px;padding:16px">${
+     ? `<h2>Results - Paid ah Wrong Questions i hmu thei</h2><div style="background:white;border-radius:16px;padding:16px">${
           myAttempts.length
-            ? myAttempts
-                .map((a) => {
+           ? myAttempts
+               .map((a) => {
                   const inf = getMockInfo(a.test_id);
                   const t = allTests.find(
                     (x) => String(x.id) === String(a.test_id)
                   );
                   const canView = t
-                    ? t.access_type === 'free' ||
+                   ? t.access_type === 'free' ||
                       getStatus(t).ok ||
                       getStatus(t).prem ||
                       isPremium()
@@ -945,7 +939,7 @@ function renderDashboard() {
                     inf.subject
                   )}</small> ${
                     t && t.access_type === 'paid'
-                      ? '<small style="background:#fffbeb;padding:2px 6px;border-radius:8px;border:1px solid gold">PAID</small>'
+                     ? '<small style="background:#fffbeb;padding:2px 6px;border-radius:8px;border:1px solid gold">PAID</small>'
                       : ''
                   }<br><small>${new Date(
                     a.created_at
@@ -955,16 +949,16 @@ function renderDashboard() {
                     a.score
                   }%</div>${
                     canView
-                      ? `<button onclick="window.viewAttempt('${a.id}')" style="padding:6px 12px;border-radius:20px;border:none;background:#ef4444;color:white;font-size:11px;font-weight:800;cursor:pointer">View Wrong</button>`
+                     ? `<button onclick="window.viewAttempt('${a.id}')" style="padding:6px 12px;border-radius:20px;border:none;background:#ef4444;color:white;font-size:11px;font-weight:800;cursor:pointer">View Wrong</button>`
                       : `<button onclick="window.buyTest('${a.test_id}')" style="padding:6px 10px;border-radius:20px;border:none;background:gold;font-size:11px;font-weight:800">Buy to View</button>`
                   }</div></div>`;
                 })
-                .join('')
+               .join('')
             : '<div style="text-align:center;padding:20px;color:#999">No results yet</div>'
         }</div>`
       : '') +
     (dashTab === 'leaderboard'
-      ? `<div style="background:white;border-radius:16px;padding:16px;border:1px solid #eee"><h2 style="margin:0 0 12px">🏆 Leaderboard</h2><div style="margin-bottom:12px"><label style="font-size:12px;font-weight:700">Select Mock Test:</label><br><select onchange="window.setLeaderboardMock(this.value)" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:6px;font-weight:700"><option value="">-- Select Mock --</option>${mockOptions}</select></div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;font-size:13px"><thead><tr style="background:#0f172a;color:white"><th style="padding:12px;text-align:center">Rank</th><th style="padding:12px;text-align:left">Name</th><th style="padding:12px;text-align:left">Mock Test Name</th><th style="padding:12px;text-align:left">Subject Name</th><th style="padding:12px;text-align:center">Score</th></tr></thead><tbody>${tableRows}</tbody></table></div></div>`
+     ? `<div style="background:white;border-radius:16px;padding:16px;border:1px solid #eee"><h2 style="margin:0 0 12px">🏆 Leaderboard</h2><div style="margin-bottom:12px"><label style="font-size:12px;font-weight:700">Select Mock Test:</label><br><select onchange="window.setLeaderboardMock(this.value)" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:6px;font-weight:700"><option value="">-- Select Mock --</option>${mockOptions}</select></div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;font-size:13px"><thead><tr style="background:#0f172a;color:white"><th style="padding:12px;text-align:center">Rank</th><th style="padding:12px;text-align:left">Name</th><th style="padding:12px;text-align:left">Mock Test Name</th><th style="padding:12px;text-align:left">Subject Name</th><th style="padding:12px;text-align:center">Score</th></tr></thead><tbody>${tableRows}</tbody></table></div></div>`
       : '') +
     `</div></div>`;
 }
@@ -1001,7 +995,7 @@ window.startTest = function (id) {
       const el = document.getElementById('perQTimer');
       if (el) {
         el.textContent = perQLeft + 's';
-        el.style.color = perQLeft < 10 ? 'red' : '#92400e';
+        el.style.color = perQLeft < 10? 'red' : '#92400e';
       }
       if (perQLeft <= 0) {
         if (currentQIdx < currentQs.length - 1) {
@@ -1020,7 +1014,7 @@ window.startTest = function (id) {
       const el = document.getElementById('totalTimer');
       if (el) {
         el.textContent = formatSec(totalLeft);
-        el.style.color = totalLeft < 60 ? 'red' : '#1e40af';
+        el.style.color = totalLeft < 60? 'red' : '#1e40af';
       }
       if (totalLeft <= 0) {
         alert('⏰ Time Up! Auto Submit');
@@ -1038,17 +1032,17 @@ function renderTest() {
     timerBar = `<div style="background:#fffbeb;border:2px solid #f59e0b;border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:58px;z-index:9">
       ${
         perQEnabled
-          ? `<div><b style="font-size:12px">⏱️ Q${
+         ? `<div><b style="font-size:12px">⏱️ Q${
               currentQIdx + 1
             } Timer:</b> <span id="perQTimer" style="font-weight:900;font-size:18px;color:${
-              perQLeft < 10 ? 'red' : '#92400e'
+              perQLeft < 10? 'red' : '#92400e'
             }">${perQLeft}s</span></div>`
           : ''
       }
       ${
         totalEnabled
-          ? `<div><b style="font-size:12px">⏱️ Total:</b> <span id="totalTimer" style="font-weight:900;font-size:18px;color:${
-              totalLeft < 60 ? 'red' : '#1e40af'
+         ? `<div><b style="font-size:12px">⏱️ Total:</b> <span id="totalTimer" style="font-weight:900;font-size:18px;color:${
+              totalLeft < 60? 'red' : '#1e40af'
             }">${formatSec(totalLeft)}</span></div>`
           : ''
       }
@@ -1065,11 +1059,11 @@ function renderTest() {
     let opts = '';
     ['A', 'B', 'C', 'D'].forEach((o) => {
       opts += `<label style="padding:12px;border:2px solid ${
-        userAnswers[currentQIdx] === o ? '#10b981' : '#eee'
+        userAnswers[currentQIdx] === o? '#10b981' : '#eee'
       };border-radius:12px;display:flex;gap:8px;background:${
-        userAnswers[currentQIdx] === o ? '#ecfdf5' : 'white'
+        userAnswers[currentQIdx] === o? '#ecfdf5' : 'white'
       };margin-bottom:8px;cursor:pointer"><input type="radio" name="q${currentQIdx}" value="${o}" ${
-        userAnswers[currentQIdx] === o ? 'checked' : ''
+        userAnswers[currentQIdx] === o? 'checked' : ''
       } onchange="window.selectAns(${currentQIdx},'${o}')"> ${o}. ${esc(
         q[o.toLowerCase()] || ''
       )}</label>`;
@@ -1080,12 +1074,12 @@ function renderTest() {
     <div style="display:flex;gap:8px;margin-top:16px">
       ${
         currentQIdx > 0
-          ? `<button onclick="window.prevQ()" style="flex:1;padding:12px;border-radius:12px;border:1px solid #ddd;background:white;font-weight:700">← Prev</button>`
+         ? `<button onclick="window.prevQ()" style="flex:1;padding:12px;border-radius:12px;border:1px solid #ddd;background:white;font-weight:700">← Prev</button>`
           : ''
       }
       ${
         currentQIdx < currentQs.length - 1
-          ? `<button onclick="window.nextQ()" style="flex:1;padding:12px;border-radius:12px;border:none;background:#111;color:white;font-weight:800">Next →</button>`
+         ? `<button onclick="window.nextQ()" style="flex:1;padding:12px;border-radius:12px;border:none;background:#111;color:white;font-weight:800">Next →</button>`
           : `<button onclick="window.submitTest()" style="flex:1;padding:12px;border-radius:12px;border:none;background:#10b981;color:white;font-weight:800">Submit</button>`
       }
     </div></div>`;
@@ -1094,11 +1088,11 @@ function renderTest() {
       let opts = '';
       ['A', 'B', 'C', 'D'].forEach((o) => {
         opts += `<label style="padding:10px;border:2px solid ${
-          userAnswers[i] === o ? '#111' : '#eee'
+          userAnswers[i] === o? '#111' : '#eee'
         };border-radius:10px;display:flex;gap:8px;background:${
-          userAnswers[i] === o ? '#eef2ff' : 'white'
+          userAnswers[i] === o? '#eef2ff' : 'white'
         };margin-bottom:6px"><input type="radio" name="q${i}" value="${o}" ${
-          userAnswers[i] === o ? 'checked' : ''
+          userAnswers[i] === o? 'checked' : ''
         } onchange="window.selectAns(${i},'${o}')"> ${o}. ${esc(
           q[o.toLowerCase()] || ''
         )}</label>`;
@@ -1114,16 +1108,16 @@ function renderTest() {
   ).innerHTML = `<div style="min-height:100vh;background:#f6f7fb"><div style="background:white;padding:12px 20px;display:flex;justify-content:space-between;position:sticky;top:0;border-bottom:1px solid #eee;z-index:10"><b>${esc(
     currentTest.title
   )} • ${esc(currentTest.subject || '')} ${
-    perQEnabled ? `(⏱️ ${currentTest.per_question_seconds}s/Q)` : ''
+    perQEnabled? `(⏱️ ${currentTest.per_question_seconds}s/Q)` : ''
   } ${
-    totalEnabled ? `(Total ${formatSec(currentTest.total_seconds)})` : ''
+    totalEnabled? `(Total ${formatSec(currentTest.total_seconds)})` : ''
   }</b><div style="display:flex;gap:8px"><button onclick="window.cancelTest()" style="padding:8px 12px;border-radius:20px;border:1px solid #ddd;background:white">Cancel</button>${
-    !perQEnabled
-      ? `<button onclick="window.submitTest()" style="padding:8px 16px;background:#10b981;color:white;border:none;border-radius:20px">Submit</button>`
+   !perQEnabled
+     ? `<button onclick="window.submitTest()" style="padding:8px 16px;background:#10b981;color:white;border:none;border-radius:20px">Submit</button>`
       : ''
   }</div></div><div style="max-width:700px;margin:0 auto;padding:20px">${timerBar}${html}${
-    !perQEnabled
-      ? `<button onclick="window.submitTest()" style="width:100%;padding:14px;background:#111;color:white;border:none;border-radius:12px;font-weight:800;margin-top:10px">Submit</button>`
+   !perQEnabled
+     ? `<button onclick="window.submitTest()" style="width:100%;padding:14px;background:#111;color:white;border:none;border-radius:12px;font-weight:800;margin-top:10px">Submit</button>`
       : ''
   }</div></div>`;
 }
@@ -1157,7 +1151,7 @@ window.submitTest = async function () {
   currentQs.forEach((q, i) => {
     if (userAnswers[i] === q.ans) c++;
   });
-  const score = currentQs.length ? Math.round((c / currentQs.length) * 100) : 0;
+  const score = currentQs.length? Math.round((c / currentQs.length) * 100) : 0;
   await supabase.from('test_attempts').insert({
     user_id: currentUser.id,
     test_id: currentTest.id,
@@ -1167,9 +1161,9 @@ window.submitTest = async function () {
     answers: userAnswers,
   });
   await supabase
-    .from('profiles')
-    .update({ last_seen: new Date().toISOString() })
-    .eq('id', currentUser.id);
+   .from('profiles')
+   .update({ last_seen: new Date().toISOString() })
+   .eq('id', currentUser.id);
   await loadAll();
   renderDashboard();
   window.setDashTab('results');
@@ -1184,7 +1178,7 @@ window.buyTest = function (id) {
     (currentTest.price || 100);
   const qrUrl =
     paySettings.qr1_url && paySettings.qr1_url.length > 20
-      ? paySettings.qr1_url
+     ? paySettings.qr1_url
       : qr;
   document.querySelector(
     '#app'
@@ -1235,7 +1229,7 @@ window.buyPremium = function (planId) {
     plan.price;
   const qrUrl =
     paySettings.qr1_url && paySettings.qr1_url.length > 20
-      ? paySettings.qr1_url
+     ? paySettings.qr1_url
       : qr;
   document.querySelector(
     '#app'
