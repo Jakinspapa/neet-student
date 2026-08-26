@@ -131,6 +131,18 @@ async function init() {
       renderResetPassword();
       return;
     }
+    if (hash.includes('type=signup') || hash.includes('access_token')) {
+      // Email verification success - auto login
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        alert('✅ Email Verified! Welcome!');
+        window.location.hash = '';
+        currentUser = data.session.user;
+        await loadAll();
+        renderDashboard();
+        return;
+      }
+    }
     const d = await supabase.auth.getSession();
     if (d.data.session) {
       currentUser = d.data.session.user;
@@ -207,14 +219,14 @@ function renderForm() {
   const box = document.getElementById('formBox');
   if (!box) return;
   if (forgotMode) {
-    box.innerHTML = `<div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:12px;padding:12px;margin-bottom:12px"><b style="font-size:13px">🔑 Forgot Password</b></div><input id="email" placeholder="Email" style="width:100%;padding:14px;border-radius:12px;border:2px solid #f59e0b;margin-bottom:12px;box-sizing:border-box"><button onclick="window.doForgot()" style="width:100%;padding:14px;border-radius:12px;border:none;background:#f59e0b;color:white;font-weight:800;cursor:pointer">📧 Send Reset Link</button><button onclick="window.hideForgot()" style="width:100%;padding:10px;border-radius:10px;border:none;background:#f3f4f6;margin-top:8px;cursor:pointer">← Back</button><div id="forgotMsg" style="margin-top:10px;font-size:12px;text-align:center"></div>`;
+    box.innerHTML = `<div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:12px;padding:12px;margin-bottom:12px"><b style="font-size:13px">🔑 Forgot Password</b><p style="font-size:11px;color:#666;margin:4px 0 0">Email ah reset link kan thawn ang che</p></div><input id="email" placeholder="Email" style="width:100%;padding:14px;border-radius:12px;border:2px solid #f59e0b;margin-bottom:12px;box-sizing:border-box"><button onclick="window.doForgot()" style="width:100%;padding:14px;border-radius:12px;border:none;background:#f59e0b;color:white;font-weight:800;cursor:pointer">📧 Send Reset Link</button><button onclick="window.hideForgot()" style="width:100%;padding:10px;border-radius:10px;border:none;background:#f3f4f6;margin-top:8px;cursor:pointer">← Back to Login</button><div id="forgotMsg" style="margin-top:10px;font-size:12px;text-align:center"></div>`;
     return;
   }
   if (authMode === 'login') box.innerHTML = `<input id="email" placeholder="Email" style="width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;margin-bottom:10px;box-sizing:border-box"><input id="password" type="password" placeholder="Password" style="width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;margin-bottom:16px;box-sizing:border-box"><button onclick="window.doLogin()" style="width:100%;padding:14px;border-radius:12px;border:none;background:#0f172a;color:white;font-weight:800;cursor:pointer">Login</button><div id="loginMsg" style="margin-top:8px;font-size:12px;text-align:center"></div>`;
-  else box.innerHTML = `<input id="fname" placeholder="Full Name" style="width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-bottom:8px;box-sizing:border-box"><input id="email" placeholder="Email" style="width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-bottom:8px;box-sizing:border-box"><input id="phone" placeholder="Phone" style="width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-bottom:8px;box-sizing:border-box"><input id="password" type="password" placeholder="Password (6+ chars)" style="width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-bottom:12px;box-sizing:border-box"><button onclick="window.doSignup()" style="width:100%;padding:14px;border-radius:12px;border:none;background:#f59e0b;color:white;font-weight:800;cursor:pointer">Create Account</button><div id="loginMsg"></div>`;
+  else box.innerHTML = `<input id="fname" placeholder="Full Name" style="width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-bottom:8px;box-sizing:border-box"><input id="email" placeholder="Email" style="width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-bottom:8px;box-sizing:border-box"><input id="phone" placeholder="Phone" style="width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-bottom:8px;box-sizing:border-box"><input id="password" type="password" placeholder="Password (6+ chars)" style="width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-bottom:8px;box-sizing:border-box"><input id="cpassword" type="password" placeholder="Confirm Password" style="width:100%;padding:12px;border-radius:10px;border:2px solid #f59e0b;margin-bottom:12px;box-sizing:border-box"><button onclick="window.doSignup()" style="width:100%;padding:14px;border-radius:12px;border:none;background:#f59e0b;color:white;font-weight:800;cursor:pointer">Create Account</button><div id="loginMsg" style="margin-top:8px;font-size:12px;text-align:center"></div>`;
 }
 function renderResetPassword() {
-  document.querySelector('#app').innerHTML = `<div style="min-height:100vh;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui"><div style="background:white;border-radius:24px;padding:32px;width:100%;max-width:400px;text-align:center"><h2>🔑 Set New Password</h2><input id="newPass" type="password" placeholder="New Password" style="width:100%;padding:14px;border-radius:12px;border:2px solid #10b981;margin:16px 0;box-sizing:border-box"><input id="newPass2" type="password" placeholder="Confirm" style="width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;margin-bottom:16px;box-sizing:border-box"><button onclick="window.doReset()" style="width:100%;padding:14px;border-radius:12px;border:none;background:#10b981;color:white;font-weight:800;cursor:pointer">✅ Update</button><div id="resetMsg" style="margin-top:10px;font-size:12px"></div></div></div>`;
+  document.querySelector('#app').innerHTML = `<div style="min-height:100vh;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui"><div style="background:white;border-radius:24px;padding:32px;width:100%;max-width:400px;text-align:center"><h2>🔑 Set New Password</h2><p style="font-size:12px;color:#666">Password thar siam rawh</p><input id="newPass" type="password" placeholder="New Password (6+ chars)" style="width:100%;padding:14px;border-radius:12px;border:2px solid #10b981;margin:16px 0 8px;box-sizing:border-box"><input id="newPass2" type="password" placeholder="Confirm New Password" style="width:100%;padding:14px;border-radius:12px;border:2px solid #f59e0b;margin-bottom:16px;box-sizing:border-box"><button onclick="window.doReset()" style="width:100%;padding:14px;border-radius:12px;border:none;background:#10b981;color:white;font-weight:800;cursor:pointer">✅ Update Password</button><div id="resetMsg" style="margin-top:10px;font-size:12px"></div></div></div>`;
 }
 window.setMode = function (m) { authMode = m; forgotMode = false; renderLogin(); };
 window.showForgot = function () { forgotMode = true; renderForm(); };
@@ -223,50 +235,75 @@ window.doForgot = async function () {
   const email = (document.getElementById('email')?.value || '').trim();
   if (!email) return alert('Email dah rawh');
   const msg = document.getElementById('forgotMsg');
-  if (msg) msg.innerHTML = '⏳ Sending...';
+  if (msg) msg.innerHTML = '⏳ Sending reset link...';
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
   if (error) { if (msg) msg.innerHTML = '<span style="color:red">❌ ' + error.message + '</span>'; }
-  else { if (msg) msg.innerHTML = '<span style="color:green">✅ Reset link thawn e!</span>'; }
+  else { if (msg) msg.innerHTML = '<span style="color:green">✅ Reset link thawn e!<br>📧 '+email+' inbox leh Spam folder check rawh</span>'; }
 };
 window.doReset = async function () {
   const p1 = (document.getElementById('newPass')?.value || '').trim();
   const p2 = (document.getElementById('newPass2')?.value || '').trim();
   const msg = document.getElementById('resetMsg');
-  if (p1.length < 6) { if (msg) msg.innerHTML = '<span style="color:red">6+ chars</span>'; return; }
-  if (p1!== p2) { if (msg) msg.innerHTML = '<span style="color:red">Inmil lo</span>'; return; }
+  if (p1.length < 6) { if (msg) msg.innerHTML = '<span style="color:red">❌ Password 6+ chars ni tur</span>'; return; }
+  if (p1!== p2) { if (msg) msg.innerHTML = '<span style="color:red">❌ Confirm password inmil lo!</span>'; return; }
   if (msg) msg.innerHTML = '⏳ Updating...';
   const { error } = await supabase.auth.updateUser({ password: p1 });
   if (error) { if (msg) msg.innerHTML = '<span style="color:red">❌ ' + error.message + '</span>'; }
-  else { if (msg) msg.innerHTML = '<span style="color:green">✅ Done!</span>'; setTimeout(() => { window.location.hash = ''; location.reload(); }, 2000); }
+  else { if (msg) msg.innerHTML = '<span style="color:green">✅ Password thlak fel e! Login leh rawh</span>'; setTimeout(() => { window.location.hash = ''; location.reload(); }, 2000); }
 };
 window.doLogin = async function () {
-  const e = document.getElementById('email')?.value.trim();
-  const p = document.getElementById('password')?.value.trim();
+  const e = (document.getElementById('email')?.value || '').trim();
+  const p = (document.getElementById('password')?.value || '').trim();
   const m = document.getElementById('loginMsg');
   if(!e||!p){ if(m) m.innerHTML='<span style="color:red">Fill rawh</span>'; return; }
   if(m) m.innerHTML='⏳ Logging...';
   const {data, error} = await supabase.auth.signInWithPassword({ email: e, password: p });
-  if (error) { if (m) m.innerHTML = '<span style="color:red">❌ ' + error.message + '</span>'; return; }
+  if (error) {
+    if(error.message.toLowerCase().includes('email not confirmed') || error.message.toLowerCase().includes('not confirmed')){
+      if(m) m.innerHTML = '<span style="color:#d97706">⚠️ Email verify lo!<br>Inbox leh Spam check rawh<br><button onclick="window.resendVerify()" style="margin-top:8px;padding:8px 14px;border-radius:20px;border:none;background:#f59e0b;color:white;font-weight:700;font-size:11px">📧 Resend Verification</button></span>';
+    } else {
+      if (m) m.innerHTML = '<span style="color:red">❌ ' + error.message + '</span>';
+    }
+    return;
+  }
   currentUser = data.user;
   await loadAll();
   renderDashboard();
 };
+window.resendVerify = async function(){
+  const e = (document.getElementById('email')?.value || '').trim();
+  if(!e) return alert('Email dah hmasa rawh');
+  const {error} = await supabase.auth.resend({ type: 'signup', email: e });
+  if(error) alert('❌ '+error.message);
+  else alert('✅ Verification email thawn nawn leh e!\n📧 '+e+' inbox check rawh');
+};
 window.doSignup = async function () {
-  const e = document.getElementById('email').value;
-  const p = document.getElementById('password').value;
-  const n = document.getElementById('fname').value;
-  const ph = document.getElementById('phone').value;
-  if (!e ||!p ||!n) return alert('Fill kim rawh');
+  const e = (document.getElementById('email')?.value || '').trim();
+  const p = (document.getElementById('password')?.value || '').trim();
+  const cp = (document.getElementById('cpassword')?.value || '').trim();
+  const n = (document.getElementById('fname')?.value || '').trim();
+  const ph = (document.getElementById('phone')?.value || '').trim();
+  const m = document.getElementById('loginMsg');
+  if (!e ||!p ||!n) { if(m) m.innerHTML='<span style="color:red">❌ Fill kim rawh</span>'; return; }
+  if (p.length < 6) { if(m) m.innerHTML='<span style="color:red">❌ Password 6+ chars ni tur</span>'; return; }
+  if (p!== cp) { if(m) m.innerHTML='<span style="color:red">❌ Password leh Confirm inmil lo!</span>'; return; }
+  if(m) m.innerHTML='⏳ Creating account...';
   const d = await supabase.auth.signUp({ email: e, password: p, options: { data: { full_name: n, phone: ph } } });
-  if (d.error) return alert(d.error.message);
+  if (d.error) { if(m) m.innerHTML='<span style="color:red">❌ '+d.error.message+'</span>'; return; }
   if (d.data.user) {
-    await supabase.from('profiles').insert({ id: d.data.user.id, full_name: n, phone: ph, email: e, last_seen: new Date().toISOString(), is_online: true });
-    alert('Account siam e! Login rawh');
-    authMode = 'login'; renderLogin();
+    try{
+      await supabase.from('profiles').insert({ id: d.data.user.id, full_name: n, phone: ph, email: e, last_seen: new Date().toISOString(), is_online: true });
+    }catch(err){ console.log(err); }
+    if(m) m.innerHTML='<span style="color:green">✅ Account siam fel e!<br>📧 <b>'+e+'</b> ah verification link kan thawn e.<br>Inbox leh Spam folder check la link click rawh.</span>';
+    // Auto switch to login after 4 sec
+    setTimeout(()=>{ authMode='login'; renderLogin(); const em = document.getElementById('email'); if(em) em.value=e; }, 4000);
   }
 };
 window.setDashTab = function (t) { if (t!== 'videos') selectedVideo = null; dashTab = t; renderDashboard(); };
 window.logout = async function () {
+  // Confirm logout
+  const ok = confirm('🚪 LOGOUT CONFIRM\n\nI chhuah tak tak duh em?\n\n• Online status OFF ang\n• Login leh a ngai ang');
+  if(!ok) return;
   try { if (currentUser) await supabase.from('profiles').update({ is_online: false }).eq('id', currentUser.id); } catch (e) {}
   if (onlineInterval) clearInterval(onlineInterval);
   clearTimers();
@@ -330,9 +367,10 @@ function renderTest() {
 }
 window.nextQ = function () { if (currentQIdx < currentQs.length - 1) { currentQIdx++; if (currentTest.per_question_seconds) perQLeft = currentTest.per_question_seconds; renderTest(); } };
 window.prevQ = function () { if (currentQIdx > 0) { currentQIdx--; if (currentTest.per_question_seconds) perQLeft = currentTest.per_question_seconds; renderTest(); } };
-window.cancelTest = function () { if (!confirm('Cancel?')) return; clearTimers(); renderDashboard(); };
+window.cancelTest = function () { if (!confirm('❌ Test cancel duh tak tak em?\nProgress bo vek ang!')) return; clearTimers(); renderDashboard(); };
 window.selectAns = function (i, o) { userAnswers[i] = o; };
 window.submitTest = async function () {
+  if(!confirm('✅ Submit duh tak tak em?\nScore chhiar ang.')) return;
   clearTimers(); let c = 0; currentQs.forEach((q, i) => { if (userAnswers[i] === q.ans) c++; });
   const score = currentQs.length? Math.round((c / currentQs.length) * 100) : 0;
   await supabase.from('test_attempts').insert({ user_id: currentUser.id, test_id: currentTest.id, score: score, total: currentQs.length, correct: c, answers: userAnswers });
