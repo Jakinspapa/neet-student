@@ -39,6 +39,7 @@ leaderboard = [],
   myAllPremiumPayments = [],
   premiumPlans = [],
   selectedMockFilter = '',
+  selectedChapterSubject = 'All',
   onlineInterval = null,
   forgotMode = false,
   resetMode = false,
@@ -311,9 +312,108 @@ window.logout = async function () {
   location.reload();
 };
 window.setLeaderboardMock = function (id) { selectedMockFilter = id; renderDashboard(); window.setDashTab('leaderboard'); };
+window.setChapterSubject = function (subject) {
+  selectedChapterSubject = subject || 'All';
+  dashTab = 'chapterMock';
+  renderDashboard();
+};
+
 window.playVideo = function (id) { if (!isPremium()) { alert('🔒 Premium Only!'); return window.setDashTab('premium'); } selectedVideo = allVideos.find((v) => String(v.id) === String(id)); renderDashboard(); };
 window.closeVideo = function () { selectedVideo = null; renderDashboard(); };
 window.toggleNoti = function () { showNotiPanel =!showNotiPanel; renderDashboard(); };
+
+function getChapterMocks() {
+  return allTests.filter((t) => t.mock_type === 'chapter' || (t.chapter && String(t.chapter).trim()));
+}
+
+function renderChapterMocksHtml() {
+  const chapterMocks = getChapterMocks();
+  const subjects = ['All', ...Array.from(new Set(chapterMocks.map((t) => t.subject || 'General')))];
+  if (!chapterMocks.length) {
+    return `<div style="background:white;border-radius:20px;padding:28px;text-align:center;border:1px solid #e2e8f0">
+      <div style="font-size:48px">📚</div>
+      <h3 style="margin:8px 0">Chapter-wise Mock khawhchhuah lo</h3>
+      <p style="font-size:12px;color:#64748b">Admin panel-ah chapter mock publish hmasa rawh.</p>
+    </div>`;
+  }
+
+  const filtered = selectedChapterSubject === 'All'
+    ? chapterMocks
+    : chapterMocks.filter((t) => (t.subject || 'General') === selectedChapterSubject);
+
+  const grouped = {};
+  filtered.forEach((t) => {
+    const ch = (t.chapter && String(t.chapter).trim()) || 'Chapter';
+    if (!grouped[ch]) grouped[ch] = [];
+    grouped[ch].push(t);
+  });
+
+  let groupsHtml = '';
+  Object.keys(grouped).sort().forEach((chapter) => {
+    const items = grouped[chapter].sort((a,b) =>
+      new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+    );
+
+    let cards = '';
+    items.forEach((t) => {
+      const s = getStatus(t);
+      const locked = isTestLocked(t);
+      const hasTimer = (t.per_question_seconds || 0) > 0 || (t.total_seconds || 0) > 0;
+      const qCount = t.questions ? t.questions.length : 0;
+      const border = locked ? '#8b5cf6' : (s.ok ? '#10b981' : '#e5e7eb');
+      const left = locked ? '#8b5cf6' : (s.prem ? '#10b981' : s.ok ? '#10b981' : '#f59e0b');
+      const action = locked
+        ? `alert('📅 ${getLockTime(t)} ah hawng ang!')`
+        : s.ok
+          ? `window.startTest('${t.id}')`
+          : s.pend
+            ? `alert('⏳ Admin approval nghah mek')`
+            : `window.buyTest('${t.id}')`;
+
+      cards += `<div style="background:white;border:1px solid ${border};border-left:4px solid ${left};border-radius:16px;padding:14px">
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+          <div style="flex:1">
+            <b style="font-size:14px">${esc(t.title)}</b>
+            <div style="margin-top:4px;font-size:10px;color:#64748b">${esc(t.subject || 'General')} • ${qCount} Questions</div>
+          </div>
+          <span style="background:${s.ok ? '#dcfce7' : '#fffbeb'};color:${s.ok ? '#166534' : '#92400e'};padding:4px 8px;border-radius:20px;font-size:9px;font-weight:800">${esc(s.label)}</span>
+        </div>
+        ${hasTimer ? `<div style="margin-top:8px;font-size:10px;color:#d97706">⏱️ Q:${t.per_question_seconds || 0}s • Full:${t.total_seconds ? formatSec(t.total_seconds) : 'Off'}</div>` : ''}
+        ${t.is_scheduled ? `<div style="margin-top:6px;font-size:10px;color:#6d28d9;font-weight:800">${locked ? '🔒 ' + esc(getLockTime(t)) : '🟢 LIVE'}</div>` : ''}
+        <button onclick="${action}" style="width:100%;margin-top:10px;padding:10px;border:none;border-radius:10px;background:${locked ? '#8b5cf6' : s.ok ? '#10b981' : s.pend ? '#f59e0b' : '#111'};color:white;font-weight:800">${locked ? '🔒 Locked' : esc(s.btn)}</button>
+      </div>`;
+    });
+
+    groupsHtml += `<div style="margin-bottom:18px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#667eea"></div>
+        <h3 style="margin:0;font-size:16px">${esc(chapter)}</h3>
+        <span style="font-size:10px;color:#94a3b8">${items.length} Mock${items.length === 1 ? '' : 's'}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px">${cards}</div>
+    </div>`;
+  });
+
+  const filterButtons = subjects.map((subj) => `
+    <button onclick="window.setChapterSubject('${String(subj).replace(/'/g, "\\'")}')" style="padding:8px 12px;border-radius:20px;border:1px solid ${selectedChapterSubject === subj ? '#111' : '#e2e8f0'};background:${selectedChapterSubject === subj ? '#111' : 'white'};color:${selectedChapterSubject === subj ? 'white' : '#334155'};font-size:11px;font-weight:800;cursor:pointer">
+      ${esc(subj)}
+    </button>`).join('');
+
+  return `<div>
+    <div style="background:linear-gradient(135deg,#eef2ff,#f5f3ff);border:1px solid #c7d2fe;border-radius:20px;padding:18px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+        <div>
+          <h2 style="margin:0">📚 Chapter-wise Mock Tests</h2>
+          <small style="color:#64748b">Admin panel-ah publish-te hi heta automatically an lang ang.</small>
+        </div>
+        <div style="background:white;border:1px solid #c7d2fe;padding:8px 12px;border-radius:20px;font-size:11px;font-weight:800">${chapterMocks.length} Chapter Mocks</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:14px">${filterButtons}</div>
+    </div>
+    ${groupsHtml}
+  </div>`;
+}
+
 function renderDashboard() {
   const free = allTests.filter((t) => t.access_type === 'free');
   const paid = allTests.filter((t) => t.access_type === 'paid');
@@ -344,7 +444,7 @@ function renderDashboard() {
   const selInfo = getMockInfo(selectedMockFilter);
   let tableRows = ''; if (filtered.length === 0) { tableRows = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#999">No attempts</td></tr>'; } else { filtered.forEach((a, i) => { const rank = i + 1; let rankColor = '#eee'; if (rank === 1) rankColor = 'gold'; else if (rank === 2) rankColor = '#c0c0c0'; else if (rank === 3) rankColor = '#cd7f32'; tableRows += `<tr style="border-bottom:1px solid #f3f4f6"><td style="padding:10px;text-align:center"><div style="width:28px;height:28px;border-radius:50%;background:${rankColor};display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:12px">${rank}</div></td><td style="padding:10px;font-weight:700">${esc(getUserName(a.user_id))}</td><td style="padding:10px"><b>${esc(selInfo.title)}</b></td><td style="padding:10px"><span style="background:#eef2ff;color:#667eea;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">${esc(selInfo.subject)}</span></td><td style="padding:10px;text-align:center"><span style="background:#111;color:white;padding:6px 14px;border-radius:20px;font-weight:900">${a.score}%</span></td></tr>`; }); }
   let videoHtml = ''; if (selectedVideo) { videoHtml = `<div style="background:white;border-radius:20px;padding:16px;border:2px solid #f59e0b"><button onclick="window.closeVideo()" style="padding:8px 14px;border:none;border-radius:10px;background:#f3f4f6;font-weight:700;margin-bottom:12px">← Back</button><h3 style="margin:8px 0">${esc(selectedVideo.title)}</h3><div style="background:black;border-radius:16px;overflow:hidden;aspect-ratio:16/9"><video controls controlsList="nodownload" style="width:100%;height:100%" src="${selectedVideo.video_url}"></video></div></div>`; } else { if (!premActive) { videoHtml = `<div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:2px solid #f59e0b;border-radius:20px;padding:24px;text-align:center"><div style="font-size:48px">🔒</div><h2>Premium Only</h2><button onclick="window.setDashTab('premium')" style="padding:12px 24px;background:#f59e0b;color:white;border:none;border-radius:12px;font-weight:900;width:100%">Buy Premium</button></div>`; } else { videoHtml = `<div style="display:grid;gap:10px">${allVideos.map((v) => `<div onclick="window.playVideo('${v.id}')" style="background:white;border-radius:16px;padding:12px;display:flex;gap:12px;cursor:pointer;border:1px solid #f59e0b"><div style="width:110px;height:64px;background:#0f172a;border-radius:12px;display:flex;align-items:center;justify-content:center;color:white">▶️</div><div style="flex:1"><b>${esc(v.title)}</b><br><small>${esc(v.subject)}</small></div></div>`).join('') || '<div>No videos</div>'}</div>`; } }
-  document.querySelector('#app').innerHTML = `<div style="min-height:100vh;background:#f6f7fb;font-family:system-ui"><div style="background:${premActive? 'linear-gradient(135deg,#10b981,#059669)' : 'white'};padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;border-bottom:1px solid #eee;flex-wrap:wrap;gap:8px"><div><b>NEET Mock ${premActive? 'PREMIUM' : myPremiumPending? '⏳ PENDING' : ''}</b><br><small>Avg ${avg}% • ${premExpiryText}</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button onclick="window.setDashTab('dashboard')" style="padding:8px 12px;border-radius:20px;border:none;background:${dashTab === 'dashboard'? '#0f172a' : '#f3f4f6'};color:${dashTab === 'dashboard'? 'white' : '#111'};font-weight:700;font-size:12px">📊 Dash</button><button onclick="window.setDashTab('tests')" style="padding:8px 12px;border-radius:20px;border:none;background:${dashTab === 'tests'? '#111' : '#f3f4f6'};color:${dashTab === 'tests'? 'white' : '#111'};font-weight:700;font-size:12px">Tests</button><button onclick="window.setDashTab('videos')" style="padding:8px 12px;border-radius:20px;border:none;background:${dashTab === 'videos'? '#f59e0b' : '#fffbeb'};color:${dashTab === 'videos'? 'white' : '#92400e'};font-weight:800;font-size:12px">🎥 Videos</button><button onclick="window.setDashTab('premium')" style="padding:8px 12px;border-radius:20px;border:none;background:#f59e0b;color:white;font-weight:700;font-size:12px">Premium</button><button onclick="window.setDashTab('results')" style="padding:8px 12px;border-radius:20px;border:none;background:${dashTab === 'results'? '#111' : '#f3f4f6'};color:${dashTab === 'results'? 'white' : '#111'};font-size:12px">Results</button><button onclick="window.setDashTab('leaderboard')" style="padding:8px 12px;border-radius:20px;border:none;background:${dashTab === 'leaderboard'? '#111' : '#f3f4f6'};color:${dashTab === 'leaderboard'? 'white' : '#111'};font-size:12px">Board</button><button onclick="window.logout()" style="padding:8px 12px;border-radius:20px;border:1px solid #ddd;background:white;font-size:12px">Logout</button></div></div><div style="max-width:1000px;margin:0 auto;padding:16px">${pendingBanner}` + (dashTab === 'dashboard'? `<div>${notiPanelHtml}${dashStats}<h3>Recent Tests</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">${free.slice(0, 2).map((t) => `<div style="background:white;border-radius:16px;padding:14px;border:1px solid #e2e8f0"><b>${esc(t.title)}</b><br><small>${esc(t.subject)}</small><br><button onclick="window.startTest('${t.id}')" style="margin-top:8px;padding:8px 12px;border:none;border-radius:10px;background:#111;color:white;font-weight:700;width:100%">Start</button></div>`).join('')}${paid.slice(0, 2).map((t) => `<div style="background:white;border-radius:16px;padding:14px;border:1px solid #e2e8f0"><b>${esc(t.title)}</b> - ${getStatus(t).label}<br><button onclick="window.startTest('${t.id}')" style="margin-top:8px;padding:8px 12px;border:none;border-radius:10px;background:gold;font-weight:700;width:100%">${getStatus(t).btn}</button></div>`).join('')}</div></div>` : '') + (dashTab === 'tests'? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">${notiPanelHtml}<div style="grid-column:1/-1"><h2>All Tests - ${allTests.length}</h2></div>${freeHtml + paidHtml}</div>` : '') + (dashTab === 'videos'? `<h2>🎥 Video Coaching</h2>${videoHtml}` : '') + (dashTab === 'premium'? `<h2>Premium</h2><div style="background:linear-gradient(135deg,#0f172a,#334155);color:white;border-radius:16px;padding:16px;margin-bottom:12px"><b>👑 My Premium Status</b><div style="margin-top:8px;font-size:13px"><div>Status: ${premActive? '✅ ACTIVE' : '❌ INACTIVE'}</div><div>Expiry: <b>${premExpiryText}</b></div></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">${premiumPlans.map((pl) => `<div style="background:white;border-radius:16px;padding:16px;border:1px solid #eee"><b>${pl.name}</b><div style="font-size:24px;font-weight:900">Rs.${pl.price}</div><button onclick="window.buyPremium(${pl.id})" style="width:100%;padding:10px;background:#f59e0b;color:white;border:none;border-radius:10px;font-weight:800;margin-top:8px">Buy</button></div>`).join('')}</div>` : '') + (dashTab === 'results'? `<h2>Results</h2><div style="background:white;border-radius:16px;padding:16px">${myAttempts.length? myAttempts.map((a) => { const inf = getMockInfo(a.test_id); return `<div style="padding:12px;border-bottom:1px solid #eee;display:flex;justify-content:space-between"><div><b>${esc(inf.title)}</b><br><small>${new Date(a.created_at).toLocaleDateString()}</small></div><div style="display:flex;gap:6px;align-items:center"><div style="background:#111;color:white;padding:6px 12px;border-radius:20px;font-weight:800">${a.score}%</div><button onclick="window.viewAttempt('${a.id}')" style="padding:6px 12px;border-radius:20px;border:none;background:#ef4444;color:white;font-size:11px;font-weight:800">View Wrong</button></div></div>`; }).join('') : '<div>No results</div>'}</div>` : '') + (dashTab === 'leaderboard'? `<div style="background:white;border-radius:16px;padding:16px;border:1px solid #eee"><h2>🏆 Leaderboard</h2><div style="margin-bottom:12px"><select onchange="window.setLeaderboardMock(this.value)" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;font-weight:700"><option value="">-- Select Mock --</option>${mockOptions}</select></div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#0f172a;color:white"><th style="padding:12px">Rank</th><th style="padding:12px;text-align:left">Name</th><th>Mock</th><th>Subject</th><th>Score</th></tr></thead><tbody>${tableRows}</tbody></table></div></div>` : '') + `</div></div>`;
+  document.querySelector('#app').innerHTML = `<div style="min-height:100vh;background:#f6f7fb;font-family:system-ui"><div style="background:${premActive? 'linear-gradient(135deg,#10b981,#059669)' : 'white'};padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;border-bottom:1px solid #eee;flex-wrap:wrap;gap:8px"><div><b>NEET Mock ${premActive? 'PREMIUM' : myPremiumPending? '⏳ PENDING' : ''}</b><br><small>Avg ${avg}% • ${premExpiryText}</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button onclick="window.setDashTab('dashboard')" style="padding:8px 12px;border-radius:20px;border:none;background:${dashTab === 'dashboard'? '#0f172a' : '#f3f4f6'};color:${dashTab === 'dashboard'? 'white' : '#111'};font-weight:700;font-size:12px">📊 Dash</button><button onclick="window.setDashTab('tests')" style="padding:8px 12px;border-radius:20px;border:none;background:${dashTab === 'tests'? '#111' : '#f3f4f6'};color:${dashTab === 'tests'? 'white' : '#111'};font-weight:700;font-size:12px">Tests</button><button onclick="window.setDashTab('chapterMock')" style="padding:8px 12px;border-radius:20px;border:none;background:${dashTab === 'chapterMock'? '#667eea' : '#eef2ff'};color:${dashTab === 'chapterMock'? 'white' : '#3730a3'};font-weight:800;font-size:12px">📚 Chapter</button><button onclick="window.setDashTab('videos')" style="padding:8px 12px;border-radius:20px;border:none;background:${dashTab === 'videos'? '#f59e0b' : '#fffbeb'};color:${dashTab === 'videos'? 'white' : '#92400e'};font-weight:800;font-size:12px">🎥 Videos</button><button onclick="window.setDashTab('premium')" style="padding:8px 12px;border-radius:20px;border:none;background:#f59e0b;color:white;font-weight:700;font-size:12px">Premium</button><button onclick="window.setDashTab('results')" style="padding:8px 12px;border-radius:20px;border:none;background:${dashTab === 'results'? '#111' : '#f3f4f6'};color:${dashTab === 'results'? 'white' : '#111'};font-size:12px">Results</button><button onclick="window.setDashTab('leaderboard')" style="padding:8px 12px;border-radius:20px;border:none;background:${dashTab === 'leaderboard'? '#111' : '#f3f4f6'};color:${dashTab === 'leaderboard'? 'white' : '#111'};font-size:12px">Board</button><button onclick="window.logout()" style="padding:8px 12px;border-radius:20px;border:1px solid #ddd;background:white;font-size:12px">Logout</button></div></div><div style="max-width:1000px;margin:0 auto;padding:16px">${pendingBanner}` + (dashTab === 'dashboard'? `<div>${notiPanelHtml}${dashStats}<h3>Recent Tests</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">${free.slice(0, 2).map((t) => `<div style="background:white;border-radius:16px;padding:14px;border:1px solid #e2e8f0"><b>${esc(t.title)}</b><br><small>${esc(t.subject)}</small><br><button onclick="window.startTest('${t.id}')" style="margin-top:8px;padding:8px 12px;border:none;border-radius:10px;background:#111;color:white;font-weight:700;width:100%">Start</button></div>`).join('')}${paid.slice(0, 2).map((t) => `<div style="background:white;border-radius:16px;padding:14px;border:1px solid #e2e8f0"><b>${esc(t.title)}</b> - ${getStatus(t).label}<br><button onclick="window.startTest('${t.id}')" style="margin-top:8px;padding:8px 12px;border:none;border-radius:10px;background:gold;font-weight:700;width:100%">${getStatus(t).btn}</button></div>`).join('')}</div></div>` : '') + (dashTab === 'tests'? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">${notiPanelHtml}<div style="grid-column:1/-1"><h2>All Tests - ${allTests.length}</h2></div>${freeHtml + paidHtml}</div>` : '') + (dashTab === 'chapterMock'? renderChapterMocksHtml() : '') + (dashTab === 'videos'? `<h2>🎥 Video Coaching</h2>${videoHtml}` : '') + (dashTab === 'premium'? `<h2>Premium</h2><div style="background:linear-gradient(135deg,#0f172a,#334155);color:white;border-radius:16px;padding:16px;margin-bottom:12px"><b>👑 My Premium Status</b><div style="margin-top:8px;font-size:13px"><div>Status: ${premActive? '✅ ACTIVE' : '❌ INACTIVE'}</div><div>Expiry: <b>${premExpiryText}</b></div></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">${premiumPlans.map((pl) => `<div style="background:white;border-radius:16px;padding:16px;border:1px solid #eee"><b>${pl.name}</b><div style="font-size:24px;font-weight:900">Rs.${pl.price}</div><button onclick="window.buyPremium(${pl.id})" style="width:100%;padding:10px;background:#f59e0b;color:white;border:none;border-radius:10px;font-weight:800;margin-top:8px">Buy</button></div>`).join('')}</div>` : '') + (dashTab === 'results'? `<h2>Results</h2><div style="background:white;border-radius:16px;padding:16px">${myAttempts.length? myAttempts.map((a) => { const inf = getMockInfo(a.test_id); return `<div style="padding:12px;border-bottom:1px solid #eee;display:flex;justify-content:space-between"><div><b>${esc(inf.title)}</b><br><small>${new Date(a.created_at).toLocaleDateString()}</small></div><div style="display:flex;gap:6px;align-items:center"><div style="background:#111;color:white;padding:6px 12px;border-radius:20px;font-weight:800">${a.score}%</div><button onclick="window.viewAttempt('${a.id}')" style="padding:6px 12px;border-radius:20px;border:none;background:#ef4444;color:white;font-size:11px;font-weight:800">View Wrong</button></div></div>`; }).join('') : '<div>No results</div>'}</div>` : '') + (dashTab === 'leaderboard'? `<div style="background:white;border-radius:16px;padding:16px;border:1px solid #eee"><h2>🏆 Leaderboard</h2><div style="margin-bottom:12px"><select onchange="window.setLeaderboardMock(this.value)" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;font-weight:700"><option value="">-- Select Mock --</option>${mockOptions}</select></div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#0f172a;color:white"><th style="padding:12px">Rank</th><th style="padding:12px;text-align:left">Name</th><th>Mock</th><th>Subject</th><th>Score</th></tr></thead><tbody>${tableRows}</tbody></table></div></div>` : '') + `</div></div>`;
 }
 window.startTest = function (id) {
   currentTest = allTests.find((t) => String(t.id) === String(id));
