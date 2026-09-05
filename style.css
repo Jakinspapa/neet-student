@@ -1,17 +1,14 @@
-html {
-  color-scheme: light !important;
-}
-body {
-  background: #f0f4ff !important;
-  color: #000 !important;
-  margin: 0;
-  min-height: 100vh;
-}
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color-scheme: light !important;
-  color: #000 !important;
-  background-color: #ffffff !important;
-}
+/* NEET Mizoram - World Class Mizo Glassmorphism - FIXED */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;600;800&display=swap');
+:root{--blue:#2563eb;--indigo:#4f46e5}
+*{box-sizing:border-box}
+body{font-family:'Inter',system-ui;background:#f6f8ff;margin:0}
+.jakarta{font-family:'Plus Jakarta Sans',sans-serif}
+.glass{background:rgba(255,255,255,0.78);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.7);box-shadow:0 20px 60px rgba(37,99,235,0.12), inset 0 1px 0 rgba(255,255,255,0.9)}
+.glass-input{background:rgba(255,255,255,0.85);border:1px solid #e2e8f0;transition:all .2s}
+.glass-input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,0.12);outline:none;background:white}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);animation:float 9s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(-12px,-24px)}}
+.mizo-card{border-radius:20px;background:white;border:1px solid #e2e8f0;transition:all .25s}
+.mizo-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.08)}
+.btn-mizo{border-radius:14px;padding:12px 18px;font-weight:800;cursor:pointer;transition:.2s}
