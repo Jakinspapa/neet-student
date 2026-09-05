@@ -1,52 +1,17 @@
-/* NEET Mizoram - World Class Mizo Glassmorphism - Mobile Responsive - FINAL */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;600;700;800&display=swap');
-
-* { box-sizing: border-box; }
+html {
+  color-scheme: light !important;
+}
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: #f6f8ff;
+  background: #f0f4ff !important;
+  color: #000 !important;
   margin: 0;
-  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
 }
-
-.jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
-
-/* Glass Morphism */
-.glass {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  box-shadow: 0 20px 60px rgba(37, 99, 235, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light !important;
+  color: #000 !important;
+  background-color: #ffffff !important;
 }
-
-.glass-input {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s;
-}
-.glass-input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-  outline: none;
-  background: white;
-}
-
-/* Orbs - hidden on mobile for performance */
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(70px);
-}
-.orb-1 { width: 520px; height: 520px; background: rgba(96, 165, 250, 0.28); top: -90px; left: -90px; }
-.orb-2 { width: 620px; height: 620px; background: rgba(129, 140, 248, 0.18); top: 35%; right: -140px; }
-.orb-3 { width: 440px; height: 440px; background: rgba(103, 232, 249, 0.22); bottom: -40px; left: 30%; }
-
-@media (max-width: 768px) {
-  .orb { display: none; }
-  .login-hero h1 { font-size: 34px !important; }
-}
-
-/* Scrollbar hide for tabs */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
